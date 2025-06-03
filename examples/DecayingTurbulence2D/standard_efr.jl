@@ -21,19 +21,24 @@ using FFTW
 Random.seed!(1234)
 
 # Setup
+n_dns = 512
 n = 128
+compression = 4
+ax_dns = LinRange(0.0, 1.0, n_dns + 1)
 ax = LinRange(0.0, 1.0, n + 1)
 Re = 4e4
 kolm = Re^(-3/4)
+setup_dns = Setup(; x = (ax_dns, ax_dns), Re = Re,)
+setup = Setup(; x = (ax, ax), Re = Re,)
 
-
-setup = Setup(; x = (ax, ax), Re = Re,
-			 );
+# Filter (via face average) the initial velocity of the DNS simulation
+filter_dns = FaceAverage(compression)
+ustart_dns = random_field(setup_dns, 0.0);
+ustart = apply_filter(filter_dns, ustart_dns, setup);
 
 # Define Filter and relax
 filter = DifferentialFilter(kolm)
 relax = ConstantRelax(1.)
-ustart = random_field(setup, 0.0);
 
 # Solve unsteady problem
 state, outputs = efr_solve_unsteady(;
@@ -60,7 +65,7 @@ state, outputs = efr_solve_unsteady(;
         ),
 		anim = animator(;
 						setup,
-						path="examples/animations/tmp.mp4",
+						path="examples/animations/standard_efr.mp4",
 						fieldname = :vorticity,
 						size=(500, 500),
 						nupdate=2,

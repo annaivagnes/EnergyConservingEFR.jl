@@ -4,14 +4,6 @@ struct DifferentialFilter <: AbstractFilter
     filter_radius::Float64
 end
 
-#function DifferentialFilter(filter_radius::Float64, setup)
-#    D = diffusion_mat(setup)
-#    Id = sparse(I, size(D))
-#    filter_mat = Id - 2 * (filter_radius^2) * D
-#    lu_factor = lu(filter_mat)
-#    return DifferentialFilter(filter_radius, lu_factor)
-#end
-
 function decompose_filter_mat(setup, filter_radius)
 	D = diffusion_mat(setup)
 	Id = sparse(I, size(D))

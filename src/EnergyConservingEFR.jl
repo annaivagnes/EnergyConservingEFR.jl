@@ -70,5 +70,5 @@ export efr_solve_unsteady
 export efr_ode_method_cache
 export AbstractRelax
 export ConstantRelax, AdaptiveRelax
-export dataframe_to_array, complex_dataframe_to_array, array_to_dataframe
+export dataframe_to_array, complex_dataframe_to_array, array_to_dataframe, total_enstrophy
 end

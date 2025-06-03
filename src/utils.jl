@@ -32,3 +32,35 @@ function array_to_dataframe(A)
 
     return df
 end
+
+# computation of enstrophy
+enstrophy(u, setup; kwargs...) =
+    enstrophy!(scalarfield(setup), u, setup; kwargs...)
+
+ChainRulesCore.rrule(::typeof(enstrophy), u, setup; kwargs...) =
+    (enstrophy(u, setup; kwargs...), φ -> error("Not yet implemented"))
+
+
+function enstrophy!(ens_e, u, setup)
+    (; grid, backend, workgroupsize) = setup
+    (; dimension, Np, Ip) = grid
+    D = dimension()
+    e = Offset(D)
+    ω = vorticity(u, setup) 
+    @kernel function efirst!(ens_e, u, I0)
+        I = @index(Global, Cartesian)
+        I = I + I0
+        ens_e[I] = ω[I]^2
+    end
+    ens_e! = efirst!
+    I0 = getoffset(Ip)
+    ens_e!(backend, workgroupsize)(ens_e, u, I0; ndrange = Np)
+    ens_e
+end
+
+function total_enstrophy(u, setup; kwargs...)
+    (; Ip) = setup.grid
+    ens = enstrophy(u, setup; kwargs...)
+    ens = scalewithvolume(ens, setup)
+    sum(view(ens, Ip))
+end
