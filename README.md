@@ -15,20 +15,29 @@ can be written as:
 - **Evolve**: the solution is evolved in time using a time-stepping scheme. 
 
 **Evolve equations**:
-Let $\boldsymbol{w}_{n+1}$ be the intermediate velocity. Then the scheme is:
+Let \( \boldsymbol{w}_{n+1} \) be the intermediate velocity. Then the scheme is:
 
-$\frac{\boldsymbol{w}_{n + 1} - \boldsymbol{u}_n}{\Delta t} + (\boldsymbol{w}_{n+1} \cdot \nabla) \boldsymbol{w}_{n+1} - \nu \Delta \boldsymbol{w}_{n+1} + \nabla p_{n+1} = 0$
+$$
+\frac{\boldsymbol{w}_{n+1} - \boldsymbol{u}_n}{\Delta t}
++ (\boldsymbol{w}_{n+1} \cdot \nabla) \boldsymbol{w}_{n+1}
+- \nu \Delta \boldsymbol{w}_{n+1}
++ \nabla p_{n+1} = 0,
+$$
 
-with $\nabla \cdot \boldsymbol{w}_{n+1} = 0$, boundary conditions applied as needed.
+with \( \nabla \cdot \boldsymbol{w}_{n+1} = 0 \), boundary conditions applied as needed.
 
-- **Filter**: filter the intermediate velocity $\boldsymbol{w}_{n+1}$, to
-obtain the filtered one, $\overline{\boldsymbol{w}_{n+1}}$. Different filters
+- **Filter**: filter the intermediate velocity \( \boldsymbol{w}_{n+1} \), to
+obtain the filtered one, \( \overline{\boldsymbol{w}_{n+1}} \). Different filters
 may be defined, like for instance:
 
     - a standard differential elliptic filter first presented in
 [Differential filters of elliptic type, by Germano](https://pubs.aip.org/aip/pfl/article/29/6/1757/943987).
 For example, it can be written as:
-$-2 \delta^2 \Delta \overline{\boldsymbol{w}}_{n+1} +  \overline{\boldsymbol{w}}_{n+1} = \boldsymbol{w}_{n+1}$,
+
+$$
+-2\delta^2 \Delta \overline{\boldsymbol{w}}_{n+1} + \overline{\boldsymbol{w}}_{n+1} = \boldsymbol{w}_{n+1},
+$$
+
 with the corresponding velocity boundary conditions.
     - a simple face-average;
     - a Smagorinsky closure model. Indeed, a filter can be re-written as a closure additional term into the
@@ -38,6 +47,8 @@ Flows through Spatial Filtering: Review and Perspectives by Quaini et al.](https
 where also many other filters can be found.
     - a filter defined in the frequencies domain, the novelty presented in this repository.
 
-- **Relax**: combine filtered and unfiltered fields in a convex combination, obtaining the final velocity $\boldsymbol{u}_{n+1}$:
+- **Relax**: combine filtered and unfiltered fields in a convex combination, obtaining the final velocity \( \boldsymbol{u}_{n+1} \):
 
-$\boldsymbol{u}_{n+1} = (1 - \chi) \boldsymbol{w}_{n+1} + \chi \overline{\boldsymbol{w}}_{n+1}$.
+$$
+\boldsymbol{u}_{n+1} = (1 - \chi) \boldsymbol{w}_{n+1} + \chi \overline{\boldsymbol{w}}_{n+1}.
+$$.
