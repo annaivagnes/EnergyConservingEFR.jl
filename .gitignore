@@ -1,0 +1,12 @@
+.vscode
+*.jl.*.cov
+*.jl.cov
+*.jl.mem
+*package-lock.json
+*Manifest.toml
+/Paper/
+*.swp
+*.un~
+*.DS_Store
+*.out
+/examples/animations/
