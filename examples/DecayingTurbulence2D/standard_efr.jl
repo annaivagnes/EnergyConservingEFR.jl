@@ -34,8 +34,6 @@ setup = Setup(; x = (ax, ax), Re = Re,
 filter = DifferentialFilter(kolm)
 relax = ConstantRelax(1.)
 ustart = random_field(setup, 0.0);
-uread = CSV.read("/Users/aivagnes/Desktop/CWI/Incompressible_newmatrices/csv_files/csv_ref_filtered_long/uref_0.0000.csv", DataFrame)
-ustart = dataframe_to_array(uread, n+2, n+2, 2)
 
 # Solve unsteady problem
 state, outputs = efr_solve_unsteady(;
