@@ -15,19 +15,19 @@ can be written as:
 - **Evolve**: the solution is evolved in time using a time-stepping scheme. 
 
 **Evolve equations**:
-Let \( \boldsymbol{w}_{n+1} \) be the intermediate velocity. Then the scheme is:
+Let  $\mathbf{w}_{n+1}$ be the intermediate velocity. Then the scheme is:
 
 $$
-\frac{\boldsymbol{w}_{n+1} - \boldsymbol{u}_n}{\Delta t}
-+ (\boldsymbol{w}_{n+1} \cdot \nabla) \boldsymbol{w}_{n+1}
-- \nu \Delta \boldsymbol{w}_{n+1}
+\frac{\mathbf{w}_{n+1} - \mathbf{u}_n}{\Delta t}
++ (\mathbf{w}_{n+1} \cdot \nabla) \mathbf{w}_{n+1}
+- \nu \Delta \mathbf{w}_{n+1}
 + \nabla p_{n+1} = 0,
 $$
 
-with \( \nabla \cdot \boldsymbol{w}_{n+1} = 0 \), boundary conditions applied as needed.
+with $ \nabla \cdot \mathbf{w}_{n+1} = 0 $, boundary conditions applied as needed.
 
-- **Filter**: filter the intermediate velocity \( \boldsymbol{w}_{n+1} \), to
-obtain the filtered one, \( \overline{\boldsymbol{w}_{n+1}} \). Different filters
+- **Filter**: filter the intermediate velocity $\mathbf{w}_{n+1}$, to
+obtain the filtered one, $\overline{\mathbf{w}_{n+1}}$. Different filters
 may be defined, like for instance:
 
     - a standard differential elliptic filter first presented in
@@ -35,7 +35,7 @@ may be defined, like for instance:
 For example, it can be written as:
 
 $$
--2\delta^2 \Delta \overline{\boldsymbol{w}}_{n+1} + \overline{\boldsymbol{w}}_{n+1} = \boldsymbol{w}_{n+1},
+-2\delta^2 \Delta \overline{\mathbf{w}}_{n+1} + \overline{\mathbf{w}}_{n+1} = \mathbf{w}_{n+1},
 $$
 
 with the corresponding velocity boundary conditions.
@@ -47,8 +47,8 @@ Flows through Spatial Filtering: Review and Perspectives by Quaini et al.](https
 where also many other filters can be found.
     - a filter defined in the frequencies domain, the novelty presented in this repository.
 
-- **Relax**: combine filtered and unfiltered fields in a convex combination, obtaining the final velocity \( \boldsymbol{u}_{n+1} \):
+- **Relax**: combine filtered and unfiltered fields in a convex combination, obtaining the final velocity $\mathbf{u}_{n+1}$:
 
 $$
-\boldsymbol{u}_{n+1} = (1 - \chi) \boldsymbol{w}_{n+1} + \chi \overline{\boldsymbol{w}}_{n+1}.
+\mathbf{u}_{n+1} = (1 - \chi) \mathbf{w}_{n+1} + \chi \overline{\mathbf{w}}_{n+1}.
 $$.
