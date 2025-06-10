@@ -19,7 +19,7 @@ struct AdaptiveRelax <: AbstractRelax
     compute_chi::Function
 end
 
-function apply_relax(r::AdaptiveRelax, u, ufilt)
+function apply_relax(r::AdaptiveRelax, u, ufilt, setup)
     χ = r.compute_chi(u, ufilt, setup)
     return (1 - χ) .* u .+ χ .* ufilt
 end

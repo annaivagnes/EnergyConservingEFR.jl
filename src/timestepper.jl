@@ -25,6 +25,7 @@ function efr_timestep!(
     # Read pre-computed cache in case of differential filter
     (; ustart, ku, p, tempstart, ktemp, diff) = cache
     lu_filter_mats = hasproperty(cache, :lu_filter_mats) ? cache.lu_filter_mats : nothing
+    f_star = hasproperty(cache, :f_star) ? cache.f_star : nothing
 
     nstage = length(b)
     m = closure_model
@@ -69,15 +70,19 @@ function efr_timestep!(
 
     # === EFR logic ===
     if !isnothing(filter)
-        if !isnothing(filter.filter_radius)
+        if hasproperty(filter, :filter_radius)
             u_filtered = apply_filter(filter, stepper.u, stepper.setup, lu_filter_mats)
-        else
-            u_filtered = apply_filter(filter, stepper.u, stepper.setup)
+        elseif isa(filter, FrequenciesFilter)
+            u_filtered = apply_filter(filter, stepper.u, stepper.setup, f_star)
         end
         
         
         if !isnothing(relax)
-            u_relaxed = apply_relax(relax, stepper.u, u_filtered)
+            if isa(relax, ConstantRelax)
+                u_relaxed = apply_relax(relax, stepper.u, u_filtered)
+            elseif isa(relax, AdaptiveRelax)
+                u_relaxed = apply_relax(relax, stepper.u, u_filtered, setup)
+            end
             copyto!(stepper.u, u_relaxed)
         else
             copyto!(stepper.u, u_filtered)

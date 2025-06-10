@@ -22,7 +22,7 @@ end
 
 function array_to_dataframe(A)
     Nx, Ny, Nz = size(A)  # Get the size of the array
-    df = DataFrame(i=Int[], j=Int[], value1=Float64[], value2=Float64[])  # Empty DataFrame
+    df = DataFrame(i=Int[], j=Int[], value1=ComplexF64[], value2=ComplexF64[])  # Empty DataFrame
 
     for i in 1:Nx
         for j in 1:Ny
@@ -41,26 +41,56 @@ ChainRulesCore.rrule(::typeof(enstrophy), u, setup; kwargs...) =
     (enstrophy(u, setup; kwargs...), φ -> error("Not yet implemented"))
 
 
-function enstrophy!(ens_e, u, setup)
+#function enstrophy!(ens_e, u, setup)
+#    (; grid, backend, workgroupsize) = setup
+#    (; dimension, Np, Ip) = grid
+#    D = dimension()
+#    e = IncompressibleNavierStokes.Offset(D)
+#    ω = vorticity(u, setup) 
+#    @kernel function efirst!(ens_e, ω, I0)
+#        I = @index(Global, Cartesian)
+#        I = I + I0
+#        ens_e[I] = ω[I]^2
+#    end
+#    ens_e! = efirst!
+#    I0 = getoffset(Ip)
+#    ens_e!(backend, workgroupsize)(ens_e, ω, I0; ndrange = Np)
+#    ens_e
+#end
+
+function enstrophy!(ens, u, setup; interpolate_first = false)
     (; grid, backend, workgroupsize) = setup
     (; dimension, Np, Ip) = grid
     D = dimension()
-    e = Offset(D)
-    ω = vorticity(u, setup) 
-    @kernel function efirst!(ens_e, u, I0)
+    e = IncompressibleNavierStokes.Offset(D)
+    ω = vorticity(u, setup)
+
+    @kernel function efirst!(ens, ω, I0)
         I = @index(Global, Cartesian)
         I = I + I0
-        ens_e[I] = ω[I]^2
+        v = zero(eltype(ens))
+        v += (ω[I] + ω[I-e(1)])^2
+        ens[I] = v / 8
     end
-    ens_e! = efirst!
+
+    @kernel function elast!(ens, ω, I0)
+        I = @index(Global, Cartesian)
+        I = I + I0
+        v = zero(eltype(ens))
+        v += ω[I]^2 + ω[I-e(1)]^2
+        ens[I] = v / 4
+    end
+
+    ens! = interpolate_first ? efirst! : elast!
     I0 = getoffset(Ip)
-    ens_e!(backend, workgroupsize)(ens_e, u, I0; ndrange = Np)
-    ens_e
+    ens!(backend, workgroupsize)(ens, ω, I0; ndrange = Np)
+    ens
 end
+
 
 function total_enstrophy(u, setup; kwargs...)
     (; Ip) = setup.grid
     ens = enstrophy(u, setup; kwargs...)
     ens = scalewithvolume(ens, setup)
-    sum(view(ens, Ip))
+    0.5 * sum(view(ens, Ip))
 end

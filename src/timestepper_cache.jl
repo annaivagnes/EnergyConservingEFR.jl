@@ -16,11 +16,20 @@ function efr_ode_method_cache(method::ExplicitRungeKuttaMethod, setup, filter = 
     (; ustart, ku, p, tempstart, ktemp, diff)
 
     # Pre-compute LU decomposition before time-stepping
-    println(filter)
-    lu_filter_mats = if (isnothing(filter))
-        nothing
-    elseif (!isnothing(filter) && !isnothing(filter.filter_radius))
-        decompose_filter_mat(setup, filter.filter_radius)
+    lu_filter_mats = nothing 
+    if (!isnothing(filter) && hasproperty(filter, :filter_radius))
+        lu_filter_mats = decompose_filter_mat(setup, filter.filter_radius)
     end
-    (; ustart, ku, p, tempstart, ktemp, diff, lu_filter_mats)
+    # if the filter is a FrequenciesFilter, we need to compute the filter matrix
+    if (!isnothing(filter) && isa(filter, FrequenciesFilter))
+        if !isfile(filter.filename)
+            f_star = find_f_star(setup, filter.time_train, filter.Δt_train, filter.every_train, filter.nseeds)
+            f_star = reshape(f_star, setup.grid.Nu[1][1]+2, setup.grid.Nu[1][2]+2, 2)
+            CSV.write(filter.filename, array_to_dataframe(f_star))
+        else
+            f_star = CSV.read(filter.filename, DataFrame)
+            f_star = complex_dataframe_to_array(f_star, setup.grid.Nu[1][1]+2, setup.grid.Nu[1][1]+2, 2)
+        end
+    end
+    (; ustart, ku, p, tempstart, ktemp, diff, lu_filter_mats, f_star)
 end

@@ -56,19 +56,24 @@ license = "MIT"
 include("filters/abstract_filter.jl")
 include("filters/average_filter.jl")
 include("filters/differential_filter.jl")
+include("filters/frequencies_filter.jl")
 include("relax.jl")
 include("utils.jl")
 include("timestepper.jl")
 include("solver.jl")
 include("timestepper_cache.jl")
+include("processors.jl")
 
 export AbstractFilter
 export FaceAverage, VolumeAverage
 export DifferentialFilter
+export FrequenciesFilter, find_f_star
 export efr_timestep!
 export efr_solve_unsteady
 export efr_ode_method_cache
 export AbstractRelax
 export ConstantRelax, AdaptiveRelax
 export dataframe_to_array, complex_dataframe_to_array, array_to_dataframe, total_enstrophy
+export enstrophy!, total_enstrophy
+export enstrophy_history_plot
 end

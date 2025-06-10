@@ -1,0 +1,4 @@
+function enstrophy_history_plot end
+
+enstrophy_history_plot
+
